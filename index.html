@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سامانه مدیریت مشتریان و اقساط بیمه</title>
+  <meta name="description" content="سیستم مدیریت مشتریان بیمه، یادآوری، صدور فاکتور و پیگیری اقساط و ثبت اسناد مالی">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- هدر اصلی و نوار میانبرهای ۲، ۶، ۷ -->
+  <header class="top-header">
+    <div class="header-inner">
+      <div class="brand-section">
+        <div class="brand-icon">
+          <span class="material-symbols-rounded">shield</span>
+        </div>
+        <div>
+          <h1 class="brand-title">مدیریت بیمه و اقساط</h1>
+          <p class="brand-subtitle">سیستم جامع صدور، مالی و یادآوری</p>
+        </div>
+      </div>
+
+      <!-- کلیدهای دسترسی سریع هدر -->
+      <div class="keypad-bar">
+        <button class="keypad-btn active" data-screen="home" onclick="switchScreen('home')" title="کلید ۱ یا داشبورد">
+          <span class="material-symbols-rounded" style="font-size: 18px;">dashboard</span>
+          <span>داشبورد</span>
+        </button>
+        <button class="keypad-btn" data-screen="customer" onclick="switchScreen('customer')" title="کلید ۲: پرونده مشتری">
+          <span class="key-badge key-2">۲</span>
+          <span>پرونده مشتری</span>
+        </button>
+        <button class="keypad-btn" data-screen="payment" onclick="switchScreen('payment')" title="کلید ۶: سند پرداخت">
+          <span class="key-badge key-6">۶</span>
+          <span>سند پرداخت</span>
+        </button>
+        <button class="keypad-btn" data-screen="ledger" onclick="switchScreen('ledger')" title="کلید ۷: اقساط و مانده">
+          <span class="key-badge key-7">۷</span>
+          <span>اقساط و مانده</span>
+        </button>
+        <button class="btn btn-gold btn-sm" onclick="openAddPolicyModal()" title="صدور بیمه‌نامه جدید">
+          <span class="material-symbols-rounded" style="font-size: 18px;">add</span>
+          <span class="no-mobile">بیمه‌نامه جدید</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- بدنه اصلی برنامه -->
+  <main class="app-container">
+
+    <!-- ۱. صفحه داشبورد (خانه) -->
+    <section id="view-home" class="view-container active">
+      <!-- کارت تراز کل پورتفوی بیمه -->
+      <div class="card card-navy">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+            <span class="material-symbols-rounded" style="color: #4ade80;">account_balance</span>
+            تراز مالی کل نمایندگی بیمه
+          </h3>
+          <span style="font-size: 0.75rem; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 12px;">سال مالی ۱۴۰۳</span>
+        </div>
+
+        <div class="portfolio-grid">
+          <div class="stat-item">
+            <div class="stat-item-label">مجموع وصولی (بستانکار):</div>
+            <div class="stat-item-value green" id="stat-total-credit">۰ تومان</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-label">کل مانده بدهکاری اقساط:</div>
+            <div class="stat-item-value red" id="stat-total-debit">۰ تومان</div>
+          </div>
+        </div>
+
+        <div class="portfolio-footer">
+          <div>تعداد بیمه‌گذاران فعال: <strong id="stat-customers-count">۰ نفر</strong></div>
+          <div>اقساط در انتظار تسویه: <strong id="stat-remaining-installments">۰ قسط</strong></div>
+        </div>
+      </div>
+
+      <!-- کارت‌های دسترسی سریع کلیدهای ۲، ۶، ۷ -->
+      <div class="shortcut-cards-grid">
+        <div class="shortcut-card" onclick="switchScreen('customer')">
+          <div class="shortcut-digit digit-2">۲</div>
+          <div class="shortcut-title">اطلاعات مشتری</div>
+          <div class="shortcut-desc">تلفن، آدرس، کد پستی و اقساط</div>
+        </div>
+        <div class="shortcut-card" onclick="switchScreen('payment')">
+          <div class="shortcut-digit digit-6">۶</div>
+          <div class="shortcut-title">ثبت سند پرداخت</div>
+          <div class="shortcut-desc">کارت‌خوان، فیش و تسویه قسط</div>
+        </div>
+        <div class="shortcut-card" onclick="switchScreen('ledger')">
+          <div class="shortcut-digit digit-7">۷</div>
+          <div class="shortcut-title">اقساط و بدهکاری</div>
+          <div class="shortcut-desc">جدول تیک‌زدن و مانده بدهی</div>
+        </div>
+      </div>
+
+      <!-- بخش سررسید اقساط و یادآوری‌ها -->
+      <div class="screen-title-bar" style="margin-top: 20px;">
+        <div class="screen-title-group">
+          <span class="material-symbols-rounded" style="color: var(--gold-500);">notifications_active</span>
+          <div>
+            <h3 class="screen-title">یادآوری و سررسید اقساط نزدیک</h3>
+            <p class="screen-subtitle">مشتریان دارای قسط معوق یا سررسید پیش‌رو</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="home-upcoming-list"></div>
+
+      <!-- فهرست بیمه‌نامه‌های صادر شده -->
+      <div class="screen-title-bar" style="margin-top: 24px;">
+        <div class="screen-title-group">
+          <span class="material-symbols-rounded" style="color: var(--teal-500);">folder_open</span>
+          <div>
+            <h3 class="screen-title">فهرست بیمه‌نامه‌های فعال</h3>
+            <p class="screen-subtitle">مشاهده درصد پیشرفت پرداخت و وضعیت هر قرارداد</p>
+          </div>
+        </div>
+        <button class="btn btn-teal btn-sm" onclick="openAddPolicyModal()">
+          <span class="material-symbols-rounded" style="font-size: 16px;">add</span>
+          صدور بیمه‌نامه
+        </button>
+      </div>
+
+      <div id="home-policies-list"></div>
+    </section>
+
+    <!-- ۲. صفحه پرونده مشتری و پیگیری اقساط (کلید ۲) -->
+    <section id="view-customer" class="view-container">
+      <div class="screen-title-bar">
+        <div class="screen-title-group">
+          <div class="screen-title-badge badge-2">۲</div>
+          <div>
+            <h2 class="screen-title">پرونده مشتری و پیگیری اقساط</h2>
+            <p class="screen-subtitle">کلید [۲] - مشاهده کامل مشخصات هویتی، آدرس، تلفن و وضعیت اقساط</p>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="switchScreen('home')">
+          <span class="material-symbols-rounded" style="font-size: 16px;">arrow_forward</span>
+          بازگشت
+        </button>
+      </div>
+
+      <!-- جستجوی مشتری -->
+      <div class="search-wrapper">
+        <span class="material-symbols-rounded search-icon">search</span>
+        <input 
+          type="text" 
+          id="customer-search-input" 
+          class="search-input" 
+          placeholder="جستجوی نام مشتری، کد ملی یا شماره تماس..."
+        >
+      </div>
+
+      <!-- انتخاب‌گر سریع مشتریان -->
+      <div id="customer-chips-bar" class="customer-chips-scroll"></div>
+
+      <!-- کانتینر اطلاعات مشتری و جدول اقساط -->
+      <div id="customer-detail-content"></div>
+    </section>
+
+    <!-- ۳. صفحه ثبت سند مالی و فیش پرداخت (کلید ۶) -->
+    <section id="view-payment" class="view-container">
+      <div class="screen-title-bar">
+        <div class="screen-title-group">
+          <div class="screen-title-badge badge-6">۶</div>
+          <div>
+            <h2 class="screen-title">ثبت سند مالی و پرداخت قسط</h2>
+            <p class="screen-subtitle">کلید [۶] - ثبت فیش پرداخت حق‌بیمه، تسویه اقساط و ثبت اسناد حسابداری</p>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="switchScreen('home')">
+          <span class="material-symbols-rounded" style="font-size: 16px;">arrow_forward</span>
+          بازگشت
+        </button>
+      </div>
+
+      <!-- فرم ثبت سند پرداخت -->
+      <div class="card">
+        <form id="voucher-form" onsubmit="submitPaymentVoucher(event)">
+          <div class="form-group">
+            <label class="form-label">بیمه‌گذار (مشتری): *</label>
+            <select id="voucher-customer-select" class="form-control" required></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">بیمه‌نامه مربوطه:</label>
+              <select id="voucher-policy-select" class="form-control"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">قسط مورد تسویه (اختیاری):</label>
+              <select id="voucher-installment-select" class="form-control"></select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">مبلغ پرداختی (تومان): *</label>
+              <input type="number" id="voucher-amount-input" class="form-control" placeholder="مثال: ۱۰۰۰۰۰۰" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">روش پرداخت: *</label>
+              <select id="voucher-method-select" class="form-control" required>
+                <option value="کارت‌خوان (POS)">کارت‌خوان (POS)</option>
+                <option value="کارت‌به‌کارت">کارت‌به‌کارت بانکی</option>
+                <option value="حواله پایا / ساتنا">حواله پایا / ساتنا</option>
+                <option value="چک صیادی">چک صیادی</option>
+                <option value="نقدی">وجه نقد</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">کد پیگیری یا شماره فیش / چک:</label>
+            <input type="text" id="voucher-tracking-input" class="form-control" placeholder="مثال: TRK-9812401">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">توضیحات و شرح سند:</label>
+            <textarea id="voucher-desc-input" class="form-control" rows="2" placeholder="توضیحات سند مالی و پرداخت قسط..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-teal btn-full" style="padding: 10px; font-size: 0.95rem;">
+            <span class="material-symbols-rounded">check_circle</span>
+            ثبت سند پرداخت و تسویه
+          </button>
+        </form>
+      </div>
+
+      <!-- دفتر روزنامه اسناد مالی اخیر -->
+      <div class="screen-title-bar" style="margin-top: 20px;">
+        <div class="screen-title-group">
+          <span class="material-symbols-rounded" style="color: var(--teal-500);">receipt</span>
+          <div>
+            <h3 class="screen-title">اسناد مالی و فیش‌های ثبت‌شده</h3>
+            <p class="screen-subtitle">تاریخچه تراکنش‌ها و اسناد دریافتی از بیمه‌گذاران</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="recent-vouchers-list"></div>
+    </section>
+
+    <!-- ۴. صفحه جدول جامع اقساط و مانده بدهکاری (کلید ۷) -->
+    <section id="view-ledger" class="view-container">
+      <div class="screen-title-bar">
+        <div class="screen-title-group">
+          <div class="screen-title-badge badge-7">۷</div>
+          <div>
+            <h2 class="screen-title">جدول جامع اقساط، بدهکار و بستانکار</h2>
+            <p class="screen-subtitle">کلید [۷] - مشاهده وضعیت کل اقساط، تیک‌زدن پرداخت و محاسبه مانده بدهی</p>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="switchScreen('home')">
+          <span class="material-symbols-rounded" style="font-size: 16px;">arrow_forward</span>
+          بازگشت
+        </button>
+      </div>
+
+      <!-- کارت تراز بدهکار / بستانکار -->
+      <div class="card card-navy">
+        <div class="portfolio-grid">
+          <div class="stat-item">
+            <div class="stat-item-label">بستانکار (کل وصولی‌ها):</div>
+            <div class="stat-item-value green" id="ledger-total-credit">۰ تومان</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-label">بدهکار (مانده کل اقساط معوق):</div>
+            <div class="stat-item-value red" id="ledger-total-debit">۰ تومان</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- فیلتر اقساط -->
+      <div class="filter-chips-row">
+        <button class="filter-chip active" data-filter="all">همه بیمه‌نامه‌ها</button>
+        <button class="filter-chip" data-filter="unpaid">دارای مانده بدهی</button>
+        <button class="filter-chip" data-filter="paid">تسویه شده کامل</button>
+      </div>
+
+      <!-- لیست بیمه‌نامه‌ها همراه با جدول تیک‌زدن اقساط -->
+      <div id="ledger-policies-list"></div>
+    </section>
+
+    <!-- فوتر و دکمه بازنشانی -->
+    <footer style="text-align: center; margin-top: 30px; padding: 16px; font-size: 0.78rem; color: var(--slate-500); border-top: 1px solid var(--border-color);">
+      <div>سامانه بدون سرور مدیریت بیمه • ذخیره‌سازی محلی روی مرورگر (LocalStorage)</div>
+      <div style="margin-top: 6px;">
+        <button class="btn btn-outline btn-sm" onclick="resetData()">
+          <span class="material-symbols-rounded" style="font-size: 14px;">restart_alt</span>
+          بازنشانی اطلاعات به نمونه اولیه
+        </button>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- نوار ناوبری پایین صفحه برای موبایل (Bottom Nav) -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-screen="home" onclick="switchScreen('home')">
+      <span class="material-symbols-rounded">dashboard</span>
+      <span>داشبورد</span>
+    </button>
+    <button class="nav-item" data-screen="customer" onclick="switchScreen('customer')">
+      <span class="nav-item-badge">۲</span>
+      <span class="material-symbols-rounded">badge</span>
+      <span>پرونده [۲]</span>
+    </button>
+    <button class="nav-item nav-6" data-screen="payment" onclick="switchScreen('payment')">
+      <span class="nav-item-badge">۶</span>
+      <span class="material-symbols-rounded">payment</span>
+      <span>سند مالی [۶]</span>
+    </button>
+    <button class="nav-item nav-7" data-screen="ledger" onclick="switchScreen('ledger')">
+      <span class="nav-item-badge">۷</span>
+      <span class="material-symbols-rounded">fact_check</span>
+      <span>اقساط [۷]</span>
+    </button>
+  </nav>
+
+  <!-- مودال صدور بیمه‌نامه جدید -->
+  <div id="modal-add-policy" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">صدور بیمه‌نامه جدید و تعریف اقساط</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeAddPolicyModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="new-policy-form" onsubmit="submitNewPolicy(event)">
+          <h4 style="font-size: 0.88rem; font-weight: 800; margin-bottom: 8px; color: var(--navy-900);">مشخصات بیمه‌گذار (مشتری):</h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">نام و نام خانوادگی: *</label>
+              <input type="text" id="new-cust-name" class="form-control" placeholder="مثال: رضا احمدی" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">کد ملی / شناسه: *</label>
+              <input type="text" id="new-cust-national" class="form-control" placeholder="مثال: 0081234567" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">شماره همراه: *</label>
+              <input type="tel" id="new-cust-phone" class="form-control" placeholder="09121112233" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">تاریخ تولد:</label>
+              <input type="text" id="new-cust-birth" class="form-control" placeholder="1368/06/12">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">کد پستی:</label>
+              <input type="text" id="new-cust-postal" class="form-control" placeholder="1983912345">
+            </div>
+            <div class="form-group">
+              <label class="form-label">آدرس:</label>
+              <input type="text" id="new-cust-address" class="form-control" placeholder="تهران، خیابان آزادی...">
+            </div>
+          </div>
+
+          <h4 style="font-size: 0.88rem; font-weight: 800; margin-top: 14px; margin-bottom: 8px; color: var(--navy-900);">مشخصات بیمه‌نامه و طرح اقساط:</h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">شرکت صادرکننده: *</label>
+              <select id="new-policy-company" class="form-control" required>
+                <option value="بیمه ایران">بیمه ایران</option>
+                <option value="بیمه دانا">بیمه دانا</option>
+                <option value="بیمه آسیا">بیمه آسیا</option>
+                <option value="بیمه سامان">بیمه سامان</option>
+                <option value="بیمه البرز">بیمه البرز</option>
+                <option value="بیمه پاسارگاد">بیمه پاسارگاد</option>
+                <option value="بیمه کوثر">بیمه کوثر</option>
+                <option value="بیمه معلم">بیمه معلم</option>
+                <option value="بیمه رازی">بیمه رازی</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">نوع بیمه‌نامه: *</label>
+              <select id="new-policy-type" class="form-control" required>
+                <option value="بیمه شخص ثالث خودرو">بیمه شخص ثالث خودرو</option>
+                <option value="بیمه بدنه خودرو">بیمه بدنه خودرو</option>
+                <option value="بیمه عمر و سرمایه‌گذاری">بیمه عمر و سرمایه‌گذاری</option>
+                <option value="بیمه درمان تکمیلی">بیمه درمان تکمیلی</option>
+                <option value="بیمه آتش‌سوزی و زلزله">بیمه آتش‌سوزی و زلزله</option>
+                <option value="بیمه مسئولیت مدنی">بیمه مسئولیت مدنی</option>
+                <option value="بیمه حوادث انفرادی">بیمه حوادث انفرادی</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">مورد بیمه و مشخصات تکمیلی:</label>
+            <input type="text" id="new-policy-subject" class="form-control" placeholder="مثال: پراید 131 سفید مدل 1398 (ایران 22 - 345 ص 67)">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">کل مبلغ حق‌بیمه (تومان): *</label>
+            <input type="number" id="new-policy-premium" class="form-control" placeholder="مثال: 7000000" oninput="calculateNewInstallments()" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">تعداد اقساط:</label>
+            <div class="installment-chips-grid">
+              <div class="plan-chip" data-count="1" onclick="selectInstallmentPlan(1)">۱ قسط (نقدی)</div>
+              <div class="plan-chip" data-count="3" onclick="selectInstallmentPlan(3)">۳ قسط</div>
+              <div class="plan-chip" data-count="5" onclick="selectInstallmentPlan(5)">۵ قسط</div>
+              <div class="plan-chip" data-count="6" onclick="selectInstallmentPlan(6)">۶ قسط</div>
+              <div class="plan-chip active" data-count="7" onclick="selectInstallmentPlan(7)">۷ قسط</div>
+              <div class="plan-chip" data-count="10" onclick="selectInstallmentPlan(10)">۱۰ قسط</div>
+              <div class="plan-chip" data-count="11" onclick="selectInstallmentPlan(11)">۱۱ قسط</div>
+              <div class="plan-chip" data-count="12" onclick="selectInstallmentPlan(12)">۱۲ قسط</div>
+            </div>
+            <div id="new-policy-calc-preview" style="font-size: 0.8rem; color: var(--teal-600); font-weight: 700; margin-top: 4px;"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" onclick="closeAddPolicyModal()">انصراف</button>
+            <button type="submit" class="btn btn-primary">ثبت و صدور بیمه‌نامه</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- مودال صدور و چاپ فاکتور رسمی -->
+  <div id="modal-invoice" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">فاکتور و صورتحساب رسمی</h3>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-teal btn-sm" onclick="printInvoice()">
+            <span class="material-symbols-rounded" style="font-size: 16px;">print</span>
+            چاپ فاکتور (Print)
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="closeInvoiceModal()">✕</button>
+        </div>
+      </div>
+      <div class="modal-body" id="invoice-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeInvoiceModal()">بستن</button>
+        <button class="btn btn-teal" onclick="printInvoice()">چاپ و پرینت</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- اعلان پاپ‌آپ Toast -->
+  <div id="app-toast" class="toast-msg"></div>
+
+  <!-- اسکریپت منطق برنامه -->
+  <script src="app.js"></script>
+</body>
+</html>
