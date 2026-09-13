@@ -1,0 +1,7 @@
+{
+  "name": "Insurance & Installments",
+  "description": "سیستم مدیریت مشتریان بیمه، یادآوری، صدور فاکتور و پیگیری اقساط و ثبت اسناد مالی",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
